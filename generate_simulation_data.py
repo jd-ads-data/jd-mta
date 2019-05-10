@@ -52,7 +52,6 @@ def generate_one_user():
     return x, user_profile, y
 
 
-
 def _bytes_feature(value):
     if isinstance(value, (np.ndarray, list)):
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))

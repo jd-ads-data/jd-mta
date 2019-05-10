@@ -10,7 +10,7 @@ NUM_DAYS = 15
 NUM_POS = 10
 NUM_LSTM_STATE = 64
 LEARNING_DECAY_STEP_SIZE = 1000
-LEARNING_RATE = 0.9
+LEARNING_RATE = 0.0001
 THRESHOLD_FOR_CLASSIFICATION= 0.5
 LEARNING_RATE_DECAY_FACTOR = 0.9
 
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     parrent_path = str(Path.cwd().parent)
     tfrecord_file_names = [parrent_path + '/' + gsd.data_path]
     sess = tf.Session()
-    iterator, output_types, output_shapes = input.get_dataset_iterator(tfrecord_file_names, 10, True)
+    iterator, output_types, output_shapes = input.get_dataset_iterator(tfrecord_file_names, 128, True)
     batch = input.get_dataset_batch(output_types, output_shapes)
     string_handle = sess.run(iterator.string_handle())
 
@@ -165,6 +165,7 @@ if __name__ == '__main__':
 
     sess.run(tf.global_variables_initializer())
 
-    for i in range(1000):
+    for i in range(10000):
         a = sess.run([cross_entropy_loss, train_op], feed_dict={input.handle: string_handle})
-        print(a)
+        if i % 100 == 0:
+            print(a[0])
