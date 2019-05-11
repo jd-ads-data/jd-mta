@@ -23,21 +23,21 @@ def _float_feature(value):
         return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
 
-def _bytes_sequence_feature(values):
+def bytes_sequence_feature(values):
     feature_list = [
         _bytes_feature(value) for value in values
     ]
     return tf.train.FeatureList(feature=feature_list)
 
 
-def _int64_sequence_feature(values):
+def int64_sequence_feature(values):
     feature_list = [
         _int64_feature(value) for value in values
     ]
     return tf.train.FeatureList(feature=feature_list)
 
 
-def _float_sequence_feature(values):
+def float_sequence_feature(values):
     feature_list = [
         _float_feature(value) for value in values
     ]

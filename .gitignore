@@ -2,3 +2,5 @@
 .idea
 *.iml
 __pycache__
+evaluation_data.tfrecord
+training_data.tfrecord
