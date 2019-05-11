@@ -16,7 +16,7 @@ The code is in the `python_tf/` folder. A simulation dataset in tfrecord format,
 | `python_tf/shapley_value.py` | Computes the Shapley Value. |
 | `python_tf/tfrecord_helper.py` | Defines methods that are used in generating the simulated data. |
 | `generate_simulation_data.py` | Generates the simulated data. |
-| `main.py` | An example which runs all the scripts below. |
+| `main.py` | An example which runs all the scripts above. |
 
 ### Simulation Data Generating Process.
 
