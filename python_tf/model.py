@@ -8,25 +8,25 @@ import numpy as np
 
 def bidireonal_rnn(drop_out):
     """
-    The bidireonal rnn model. The user profile is processed by another network and then added with the output
+    The bidireonal rnn model. The user characteristics is processed by another network and then added with the output
     of the output of the hidden layer. The result is the input of the output layer.
     :return: the predictions for all steps.
     """
     x_input = tf.keras.layers.Input(shape=[conf.NUM_DAYS, conf.NUM_BRANDS * conf.NUM_POS], name='x')
-    user_profile_input = tf.keras.layers.Input(shape=[1], name='user_profile')
-    brand_profile_input = tf.keras.layers.Input(shape=[conf.NUM_DAYS, conf.NUM_BRANDS], name='brand_profile')
+    user_characteristics_input = tf.keras.layers.Input(shape=[1], name='user_characteristics')
+    brand_price_index_input = tf.keras.layers.Input(shape=[conf.NUM_DAYS, conf.NUM_BRANDS], name='brand_price_index')
 
-    # # user profile layers
-    user_profile = tf.keras.layers.Dropout(rate=drop_out, name='user_profile_dropout')(user_profile_input)
-    user_profile = tf.keras.layers.Dense(
+    # # user attributes layers
+    user_characteristics = tf.keras.layers.Dropout(rate=drop_out, name='user_characteristics_dropout')(user_characteristics_input)
+    user_characteristics = tf.keras.layers.Dense(
         units=conf.NUM_DAYS * conf.NUM_BRANDS,
         activation='tanh',
         bias_initializer='zeros',
-        name='user_profile_layer')(user_profile)
-    user_profile = tf.keras.layers.Reshape(target_shape=[conf.NUM_DAYS, conf.NUM_BRANDS])(user_profile)
+        name='user_characteristics_layer')(user_characteristics)
+    user_characteristics = tf.keras.layers.Reshape(target_shape=[conf.NUM_DAYS, conf.NUM_BRANDS])(user_characteristics)
 
     # # rnn layers
-    x = tf.keras.layers.Concatenate(axis=2, name='conc_x_and_brand_profile')([x_input, brand_profile_input])
+    x = tf.keras.layers.Concatenate(axis=2, name='conc_x_and_brand_price_index')([x_input, brand_price_index_input])
     # x: [batch_size, num_days, 2 * num_lstm_state]
     x = tf.keras.layers.Bidirectional(
         layer=tf.keras.layers.LSTM(
@@ -46,7 +46,7 @@ def bidireonal_rnn(drop_out):
         name='x_out')(x)
 
     # # predictions
-    predictions = tf.keras.layers.Add()([x, user_profile])
+    predictions = tf.keras.layers.Add()([x, user_characteristics])
     predictions = tf.keras.layers.Dropout(rate=drop_out, name='output_dropout')(predictions)
     predictions = tf.keras.layers.Dense(
         units=conf.NUM_BRANDS,
@@ -57,7 +57,7 @@ def bidireonal_rnn(drop_out):
         name='output_layer')(predictions)
 
     # build the model
-    model = tf.keras.Model(inputs=[x_input, user_profile_input, brand_profile_input], outputs=predictions)
+    model = tf.keras.Model(inputs=[x_input, user_characteristics_input, brand_price_index_input], outputs=predictions)
 
     return model
 
@@ -82,8 +82,8 @@ if __name__ == '__main__':
 
     compile_model(rnn_model, 0.0001)
 
-    x, u, b, y = sess.run([batch['x'], batch['user_profile'], batch['brand_profile'], batch['y']])
+    x, u, b, y = sess.run([batch['x'], batch['user_characteristics'], batch['brand_price_index'], batch['y']])
 
-    rnn_model.fit(x=[batch['x'], batch['user_profile'], batch['brand_profile']],
+    rnn_model.fit(x=[batch['x'], batch['user_characteristics'], batch['brand_price_index']],
               y=batch['y'], steps_per_epoch =1000, epochs=10000)
 

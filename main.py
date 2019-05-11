@@ -35,33 +35,33 @@ def mta_example():
     # train the model
     print('------- Train the model using training data.')
     rnn_model.fit(
-        x=[training_data['x'], training_data['user_profile'], training_data['brand_profile']], y=training_data['y'],
+        x=[training_data['x'], training_data['user_characteristics'], training_data['brand_price_index']], y=training_data['y'],
         steps_per_epoch=2000, epochs=2)
 
     # evaluate the model
     print('------- Evaluate the model using evaluation data.')
-    rnn_model.evaluate(x=[evaluation_data['x'], evaluation_data['user_profile'], evaluation_data['brand_profile']],
+    rnn_model.evaluate(x=[evaluation_data['x'], evaluation_data['user_characteristics'], evaluation_data['brand_price_index']],
                        y=evaluation_data['y'],
                        steps=100)
 
     # Compute the Shapley value for the data of which the y is 1.0
-    def predict_fn(x, user_profile, brand_profile, brand_index):
-        prediction_all_step = rnn_model.predict(x=[[x], [user_profile], [brand_profile]], batch_size=1)
+    def predict_fn(x, user_characteristics, brand_price_index, brand_index):
+        prediction_all_step = rnn_model.predict(x=[[x], [user_characteristics], [brand_price_index]], batch_size=1)
         prediction = prediction_all_step[0, conf.NUM_DAYS - 1, brand_index]
         return prediction
 
     attribution_data, attribution_ini = input.get_dataset([training_file], 1)
     sess.run(attribution_ini)
     for i in range(1000):
-        x_in, user_profile_in, brand_profile_in, y_in = sess.run([
-            attribution_data['x'], attribution_data['user_profile'],
-            attribution_data['brand_profile'], attribution_data['y']
+        x_in, user_characteristics_in, brand_price_index_in, y_in = sess.run([
+            attribution_data['x'], attribution_data['user_characteristics'],
+            attribution_data['brand_price_index'], attribution_data['y']
         ])
         for brand_index in range(conf.NUM_BRANDS):
             if y_in[0, conf.NUM_DAYS - 1, brand_index] > 0.0:
                 attribution_result = shapley_value.compute_shapley_value(
-                    x_in[0], user_profile_in[0],
-                    brand_profile_in[0], brand_index, predict_fn)
+                    x_in[0], user_characteristics_in[0],
+                    brand_price_index_in[0], brand_index, predict_fn)
                 print('User %d, brand %d, Shapley value for each ad position: ' %(i, brand_index), '')
                 print(attribution_result)
 

@@ -15,16 +15,16 @@ def count_1_in_binary(n):
     return bin(n).count("1")
 
 
-def compute_shapley_value(x, user_profile, brand_profile, brand_index, predict_fn):
+def compute_shapley_value(x, user_characteristics, brand_price_index, brand_index, predict_fn):
     """
-    Compute the Shapley value of each tuple of (time, ad_position) in one brand for a conversion by the exact method,
+    Compute the Shapley value of each tuple of (time, ad-exposures) in one brand for a conversion by the exact method,
     and then sum all the Shapley values for each ad position across all days.
-    :param x: ad exposure sequence, [conf.NUM_DAYS, num_brand * conf.NUM_POS]
-    :param user_profile: the user profile for the user [1]
-    :param brand_profile: the brand index for each brand, [conf.NUM_DAYS, num_brand]
+    :param x: ad exposures in each day, each brand and each ad-position , [conf.NUM_DAYS, num_brand * conf.NUM_POS]
+    :param user_characteristics: the time irrelevant characteristics for the user [1]
+    :param brand_price_index: the brand index for each brand, [conf.NUM_DAYS, num_brand]
     :param brand_index: the index of the brand, []
     :param predict_fn: a method which predicts the probability of the conversion in the last day given the features
-    :return: the Shapley value for each tuple of (time, ad_position) of the brand, [conf.NUM_DAYS, conf.NUM_POS]
+    :return: the Shapley value for each tuple of (time, ad-exposures) of the brand, [conf.NUM_DAYS, conf.NUM_POS]
     """
     shapley_value_for_tuple = np.zeros([conf.NUM_DAYS, conf.NUM_POS])
     non_zero_tuple_index_list = []
@@ -43,7 +43,7 @@ def compute_shapley_value(x, user_profile, brand_profile, brand_index, predict_f
                 brand_pos_index = non_zero_tuple_index_list[j][1] + brand_index * conf.NUM_POS
                 cp_x[date_index, brand_pos_index] = 0.0
 
-        prediction = predict_fn(cp_x, user_profile, brand_profile, brand_index)
+        prediction = predict_fn(cp_x, user_characteristics, brand_price_index, brand_index)
 
         num_pos_in_case_index = count_1_in_binary(case_index)
         factorial_n = math.factorial(num_tuples)
@@ -56,7 +56,6 @@ def compute_shapley_value(x, user_profile, brand_profile, brand_index, predict_f
                 s = num_pos_in_case_index
                 value_to_minus = 1. * math.factorial(num_tuples - s - 1) * math.factorial(s) / factorial_n * prediction
                 shapley_value_for_tuple[non_zero_tuple_index_list[j]] -= value_to_minus
-        # print(shapley_value_for_tuple)
 
     # normalize the shapley value
     x_0 = np.copy(x)
@@ -67,8 +66,8 @@ def compute_shapley_value(x, user_profile, brand_profile, brand_index, predict_f
         if shapley_value_for_tuple[tup] < 0.0:
             shapley_value_for_tuple[tup] = 0.0
 
-    p_x = predict_fn(x, user_profile, brand_profile, brand_index)
-    p_0 = predict_fn(x_0, user_profile, brand_profile, brand_index)
+    p_x = predict_fn(x, user_characteristics, brand_price_index, brand_index)
+    p_0 = predict_fn(x_0, user_characteristics, brand_price_index, brand_index)
     inc_p = np.max([p_x - p_0, 0])
     sum_all_shapley_values = np.max([np.sum(shapley_value_for_tuple), 0.0])
 

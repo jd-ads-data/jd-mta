@@ -2,26 +2,24 @@ import tensorflow as tf
 from python_tf import configures as conf
 from pathlib import Path
 
-handle = tf.placeholder(tf.string, shape=[])
-
 
 def _parse_function(example_proto):
     sequence_features = {
-        'x': tf.FixedLenSequenceFeature([], dtype=tf.float32),
-        'user_profile': tf.FixedLenSequenceFeature([], dtype=tf.float32),
-        'brand_profile': tf.FixedLenSequenceFeature([], dtype=tf.float32),
-        'y': tf.FixedLenSequenceFeature([], dtype=tf.float32),
+        'x': tf.io.FixedLenSequenceFeature([], dtype=tf.float32),
+        'user_characteristics': tf.io.FixedLenSequenceFeature([], dtype=tf.float32),
+        'brand_price_index': tf.io.FixedLenSequenceFeature([], dtype=tf.float32),
+        'y': tf.io.FixedLenSequenceFeature([], dtype=tf.float32),
     }
-    _, sequence_parsed = tf.parse_single_sequence_example(
+    _, sequence_parsed = tf.io.parse_single_sequence_example(
         serialized=example_proto,
         sequence_features=sequence_features
     )
 
     x = sequence_parsed['x']
-    user_profile = sequence_parsed['user_profile']
-    brand_profile = sequence_parsed['brand_profile']
+    user_characteristics = sequence_parsed['user_characteristics']
+    brand_price_index = sequence_parsed['brand_price_index']
     y = sequence_parsed['y']
-    input_tensors = [x, user_profile, brand_profile, y]
+    input_tensors = [x, user_characteristics, brand_price_index, y]
 
     return input_tensors
 
@@ -30,14 +28,14 @@ def get_dataset(file_list, batch_size, shuffle=False, repeat=True):
     dataset = tf.data.TFRecordDataset(file_list)
     dataset = dataset.map(_parse_function)
     dataset = dataset.map(
-        lambda x, user_profile, brand_profile, y:
+        lambda x, user_characteristics, brand_price_index, y:
         {
             # x: [num_days, num_brands * num_pos]
             'x': tf.reshape(x, [conf.NUM_DAYS, conf.NUM_BRANDS * conf.NUM_POS]),
-            # user_profile: [1]
-            'user_profile': tf.reshape(user_profile, [1]),
-            # brand_profile: [num_days, num_brands]
-            'brand_profile': tf.reshape(brand_profile, [conf.NUM_DAYS, conf.NUM_BRANDS]),
+            # user_characteristics: [1]
+            'user_characteristics': tf.reshape(user_characteristics, [1]),
+            # brand_price_index: [num_days, num_brands]
+            'brand_price_index': tf.reshape(brand_price_index, [conf.NUM_DAYS, conf.NUM_BRANDS]),
             # y: [num_days, num_brands]
             'y': tf.reshape(y, [conf.NUM_DAYS, conf.NUM_BRANDS]),
         })
