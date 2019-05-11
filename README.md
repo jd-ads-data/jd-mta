@@ -18,11 +18,11 @@ The code is in the `python_tf/` folder. A simulation dataset in tfrecord format,
 | `generate_simulation_data.py` | Generates the simulated data. |
 | `main.py` | An example which runs all the scripts above. |
 
-### Simulation Data Generating Process.
+### Simulation of Data Generating Process.
 
-Random data is generated to simulate user behavior. The following table lists the parameters used to simulate the data and outlines the data generating process.
+User behavior is simulated at fixed parameters values under a model with sequential dependence. The following table lists the parameters used and outlines the data generating process. The code trains the proposed RNN on these data, and computes the corresponding Shapley Values described in the paper.
 
-| Parameter | Value | Explaination |
+| Parameter | Value Used in Code | Explanation |
 | :--- | :---: | :--- |
 | NUM_BRANDS | 2 | Number of brands. |
 | NUM_DAYS | 5 | Number of days for the sequence of relevant ad exposures. |
