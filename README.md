@@ -6,7 +6,7 @@ The repository contains sample code in **TensorFlow** for a simulation that impl
 
 ### Introduction
 
-The code is in the `python_tf/` folder. A simulation dataset in tfrecord format, is in the `data/` filder. The different python scripts in the repository are below:
+The code is in the `python_tf/` folder. The simulation dataset is in the `data/` folder. The different python scripts in the repository are below:
 
 | Script Path | Function |
 |--- | --- |
@@ -18,11 +18,11 @@ The code is in the `python_tf/` folder. A simulation dataset in tfrecord format,
 | `generate_simulation_data.py` | Generates the simulated data. |
 | `main.py` | An example which runs all the scripts above. |
 
-### Simulation Data Generating Process.
+### Simulation Details
 
-Random data is generated to simulate user behavior. The following table lists the parameters used to simulate the data and outlines the data generating process.
+User behavior is simulated at fixed parameters values under a model with sequential dependence. The following table lists the parameters used and outlines the data generating process. The code trains the proposed RNN on these data, and computes the corresponding Shapley Values described in the paper.
 
-| Parameter | Value | Explaination |
+| Parameter | Value Used in Code | Explanation |
 | :--- | :---: | :--- |
 | NUM_BRANDS | 2 | Number of brands. |
 | NUM_DAYS | 5 | Number of days for the sequence of relevant ad-exposures. |
