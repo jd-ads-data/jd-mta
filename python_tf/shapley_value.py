@@ -70,7 +70,6 @@ def compute_shapley_value(x, user_profile, brand_profile, brand_index, predict_f
     p_x = predict_fn(x, user_profile, brand_profile, brand_index)
     p_0 = predict_fn(x_0, user_profile, brand_profile, brand_index)
     inc_p = np.max([p_x - p_0, 0])
-    print(inc_p, p_x, p_0)
     sum_all_shapley_values = np.max([np.sum(shapley_value_for_tuple), 0.0])
 
     if sum_all_shapley_values > 1e-10 and inc_p > 1.0e-10:

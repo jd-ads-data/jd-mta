@@ -18,7 +18,7 @@ def mta_example():
 
     # get the input dataset and initialize the iterators
     print('------- Getting input datasets and initializing.')
-    training_data, training_ini = input.get_dataset([training_file], 64, shuffle=True)
+    training_data, training_ini = input.get_dataset([training_file], 256, shuffle=True)
     evaluation_data, evaluation_ini = input.get_dataset([evaluation_file], 128)
     sess = tf.keras.backend.get_session()
     sess.run([training_ini, evaluation_ini])
@@ -30,13 +30,13 @@ def mta_example():
 
     # compile the model
     print('------- Compile the model.')
-    model.compile_model(model=rnn_model, learning_rate=1e-4)
+    model.compile_model(model=rnn_model, learning_rate=conf.LEARNING_RATE)
 
     # train the model
     print('------- Train the model using training data.')
     rnn_model.fit(
         x=[training_data['x'], training_data['user_profile'], training_data['brand_profile']], y=training_data['y'],
-        steps_per_epoch=10000, epochs=20)
+        steps_per_epoch=2000, epochs=2)
 
     # evaluate the model
     print('------- Evaluate the model using evaluation data.')
