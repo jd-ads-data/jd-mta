@@ -25,9 +25,9 @@ Random data is generated to simulate user behavior. The following table lists th
 | Parameter | Value | Explaination |
 | :--- | :---: | :--- |
 | NUM_BRANDS | 2 | Number of brands. |
-| NUM_DAYS | 5 | Number of days for the ad exposure sequence. |
-| NUM_POS | 2 | Number of days for the ad exposure sequence. |
-| $a$ | 2 | Average number of the ad-exposures that a user see at one ad-position for one brand in one day. |
+| NUM_DAYS | 5 | Number of days for the sequence of relevant ad exposures. |
+| NUM_POS | 2 | Number of ad-positions. |
+| $a$ | 2 | Average number of ad-exposures a user sees at one ad-position for one brand in one day. |
 | N | 10000 | Number of simulated users in the simulation data. |
 
 Let $i = 1..N$ be the index of the user, $b=1..B$ be the index of the brand and $t=1..T$ be the index of the day. We denote by $x_{i,t,b}$ the ad-exposure vector for user $i$ and brand $b$ in day $t$, $y_{i,t,b}$ the binary value that denoted whether there is a conversion for user $i$ and brand $b$ at day $t$, $d_i$ the user profile vector (i.e., user time-invariant attributes) and $r_b$ the brand profile for brand $b$ (i.e., brand time-invariant attributes). The data are simulated as follows:
