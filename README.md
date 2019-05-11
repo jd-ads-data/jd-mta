@@ -6,21 +6,21 @@ The repository contains sample code in **TensorFlow** for a simulation that impl
 
 ### Introduction
 
-The code is in the `python_tf/` folder. The simulation data in provided tfrecord format, and in the `data/` filder. The function of each python script in the repository is listed in the table below.
+The code is in the `python_tf/` folder. A simulation dataset in tfrecord format, is in the `data/` filder. The different python scripts in the repository are below:
 
 | Script Path | Function |
 |--- | --- |
-| `python_tf/consigures.py` | The consiguration file. |
+| `python_tf/consigures.py` | Configuration file. |
 | `python_tf/input.py` | Processes tfrecord files by dataset. |
 | `python_tf/model.py` | Expresses the rnn model. |
 | `python_tf/shapley_value.py` | Computes the Shapley Value. |
-| `python_tf/tfrecord_helper.py` | Defines a couple of methods that would be used in generating simulation data. |
-| `generate_simulation_data.py` | Generates the simulation data. |
+| `python_tf/tfrecord_helper.py` | Defines methods that are used in generating the simulated data. |
+| `generate_simulation_data.py` | Generates the simulated data. |
 | `main.py` | An example which runs all the scripts below. |
 
-### Explaination of the Simulation Data Generating.
+### Simulation Data Generating Process.
 
-Some random data is generated to simulate the user behavior and conversion. The following table lists the parameters of the simulation data.
+Random data is generated to simulate user behavior. The following table lists the parameters used to simulate the data and outlines the data generating process.
 
 | Parameter | Value | Explaination |
 | :--- | :---: | :--- |
@@ -30,7 +30,7 @@ Some random data is generated to simulate the user behavior and conversion. The 
 | $a$ | 2 | Average number of the ad-exposures that a user see at one ad-position for one brand in one day. |
 | N | 10000 | Number of simulated users in the simulation data. |
 
-Let $i = 1..N$ be the index of the user, $b=1..B$ be the index of the brand and $t=1..T$ be the index of the day. Then we denote by $x_{i,t,b}$ the ad-exposure vector for user $i$ and brand $b$ in day $t$, $y_{i,t,b}$ the binary value that shows whether there is a conversion for user $i$ and brand $b$ at day $t$, $d_i$ the user profile and $r_b$ the brand profile for brand $b$. The generating process can be expressed as following.
+Let $i = 1..N$ be the index of the user, $b=1..B$ be the index of the brand and $t=1..T$ be the index of the day. We denote by $x_{i,t,b}$ the ad-exposure vector for user $i$ and brand $b$ in day $t$, $y_{i,t,b}$ the binary value that denoted whether there is a conversion for user $i$ and brand $b$ at day $t$, $d_i$ the user profile vector (i.e., user time-invariant attributes) and $r_b$ the brand profile for brand $b$ (i.e., brand time-invariant attributes). The data are simulated as follows:
 
 $$ h_{i, 0, b} \sim N(0, 1) $$
 $$ d_{i} \sim U(0, 1) $$
