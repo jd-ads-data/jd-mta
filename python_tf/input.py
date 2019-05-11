@@ -1,5 +1,5 @@
 import tensorflow as tf
-import generate_simulation_data as gsd
+from python_tf import configures as conf
 from pathlib import Path
 
 handle = tf.placeholder(tf.string, shape=[])
@@ -33,13 +33,13 @@ def get_dataset_iterator(file_list, batch_size, shuffle=False):
         lambda x, user_profile, brand_profile, y:
         {
             # x: [num_days, num_brand * num_pos]
-            'x': tf.reshape(x, [gsd.NUM_DAYS, gsd.NUM_BRANDS * gsd.NUM_POS]),
+            'x': tf.reshape(x, [conf.NUM_DAYS, conf.NUM_BRANDS * conf.NUM_POS]),
             # user_profile: [1]
             'user_profile': tf.reshape(user_profile, [1]),
             # brand_profile: [num_days, num_brands]
-            'brand_profile': tf.reshape(brand_profile, [gsd.NUM_DAYS, gsd.NUM_BRANDS]),
+            'brand_profile': tf.reshape(brand_profile, [conf.NUM_DAYS, conf.NUM_BRANDS]),
             # y: [num_days, num_brands]
-            'y': tf.reshape(y, [gsd.NUM_DAYS, gsd.NUM_BRANDS]),
+            'y': tf.reshape(y, [conf.NUM_DAYS, conf.NUM_BRANDS]),
         })
     if shuffle:
         dataset = dataset.shuffle(buffer_size=batch_size * 2)
@@ -60,7 +60,7 @@ def get_dataset_batch(output_types, output_shapes):
 
 if __name__ == '__main__':
     parrent_path = str(Path.cwd().parent)
-    tfrecord_file_names = [parrent_path + '/' + gsd.data_path]
+    tfrecord_file_names = [parrent_path + '/' + conf.data_path]
     sess = tf.Session()
     iterator, training_types, training_shapes = get_dataset_iterator(
         file_list=tfrecord_file_names,

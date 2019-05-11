@@ -1,18 +1,10 @@
 import math
 import tensorflow as tf
-from tf import input
-from tf import metrics
+from python_tf import input
+from python_tf import metrics
+from python_tf import configures as conf
 from pathlib import Path
 import generate_simulation_data as gsd
-
-NUM_BRANDS = 2
-NUM_DAYS = 15
-NUM_POS = 10
-NUM_LSTM_STATE = 64
-LEARNING_DECAY_STEP_SIZE = 1000
-LEARNING_RATE = 0.0001
-THRESHOLD_FOR_CLASSIFICATION= 0.5
-LEARNING_RATE_DECAY_FACTOR = 0.9
 
 
 def _variable_on_cpu(name, shape, initializer):
@@ -53,34 +45,32 @@ def bidireonal_rnn(x, brand_profile, user_profile, keep_prob):
 
     with tf.variable_scope('user_profile_layer'):
         weights_user_profile = get_a_variable_on_cpu(
-            name='weights_user_profile', shape=[1, NUM_BRANDS], normal_init=True)
+            name='weights_user_profile', shape=[1, conf.NUM_BRANDS], normal_init=True)
         bias_user_profile = get_a_variable_on_cpu(
-            name='bias_user_profile', shape=[NUM_BRANDS], normal_init=False)
+            name='bias_user_profile', shape=[conf.NUM_BRANDS], normal_init=False)
         # user_profile: [batch_size, num_brands]
         user_profile = tf.matmul(user_profile, weights_user_profile) + bias_user_profile
         # user_profile: [batch_size, num_brands * num_days]
-        user_profile = tf.tile(user_profile, [1, NUM_DAYS])
+        user_profile = tf.tile(user_profile, [1, conf.NUM_DAYS])
         user_profile = tf.nn.tanh(user_profile)
         user_profile = tf.nn.dropout(user_profile, keep_prob=keep_prob)
         # user_profile: [batch_size * num_days, num_brands]
-        user_profile = tf.reshape(user_profile, [-1, NUM_BRANDS])
+        user_profile = tf.reshape(user_profile, [-1, conf.NUM_BRANDS])
 
     with tf.name_scope('lstm_layer'):
         x = tf.concat([x, brand_profile], 2)
         drop_out = 1 - keep_prob
-        # output_fw: [batch_size, num_days, num_lstm_state]
-        # output_bw: [batch_size, num_days, num_lstm_state]
-        x = \
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=NUM_LSTM_STATE,
-                           dropout=drop_out,
-                           return_sequences=True,
-                           input_shape=(NUM_DAYS, NUM_BRANDS * 11)
-                           ))(x)
+        # x: [batch_size, num_days, 2 * num_lstm_state]
+        x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=conf.NUM_LSTM_STATE,
+                                                               dropout=drop_out,
+                                                               return_sequences=True,
+                                                               input_shape=(conf.NUM_DAYS, conf.NUM_BRANDS * 11)
+                                                               ))(x)
         # outputs: [batch_size * num_days, num_lstm_state]
-        outputs = tf.reshape(x, [-1, 2 * NUM_LSTM_STATE])
+        outputs = tf.reshape(x, [-1, 2 * conf.NUM_LSTM_STATE])
         weights_lstm_out = get_a_variable_on_cpu(
             name='weights_lstm_out',
-            shape=[2 * NUM_LSTM_STATE, NUM_BRANDS],
+            shape=[2 * conf.NUM_LSTM_STATE, conf.NUM_BRANDS],
             normal_init=True)
         # outputs: [batch_size * num_days, num_brands]
         outputs = tf.matmul(outputs, weights_lstm_out)
@@ -91,11 +81,70 @@ def bidireonal_rnn(x, brand_profile, user_profile, keep_prob):
         # predictions: [batch_size * num_days, num_brands]
         predictions = tf.nn.dropout(predictions, keep_prob=keep_prob)
         # predions: [batch_size, num_days, num_brands]
-        predictions = tf.reshape(predictions, [-1, NUM_DAYS, NUM_BRANDS])
+        predictions = tf.reshape(predictions, [-1, conf.NUM_DAYS, conf.NUM_BRANDS])
         # predictionslast_step: [batch_size, num_brands]
-        predictions_last_step = tf.reshape(predictions[:, NUM_DAYS - 1, :], [-1, NUM_BRANDS])
+        predictions_last_step = tf.reshape(predictions[:, conf.NUM_DAYS - 1, :], [-1, conf.NUM_BRANDS])
 
     return predictions, predictions_last_step
+
+
+def bidireonal_rnn_keras(drop_out):
+    """
+    The bidireonal rnn model. The user profile is processed by another network and then added with the output
+    of the output of the hidden layer. The result is the input of the output layer.
+    :param x: [batch_size, num_days, num_brand * num_pos]
+    :param brand_profile: [batch_size, num_days, num_brand]
+    :param user_profile: [1]
+    :return: the predions for all steps and the predions for the last step.
+    """
+    x_input = tf.keras.layers.Input(shape=[conf.NUM_DAYS, conf.NUM_BRANDS * conf.NUM_POS], name='x')
+    brand_profile_input = tf.keras.layers.Input(shape=[conf.NUM_DAYS, conf.NUM_BRANDS], name='brand_profile')
+    user_profile_input = tf.keras.layers.Input(shape=[1], name='user_profile')
+
+    # # user profile layers
+    user_profile = tf.keras.layers.Dropout(rate=drop_out, name='user_profile_dropout')(user_profile_input)
+    user_profile = tf.keras.layers.Dense(
+        units=conf.NUM_DAYS * conf.NUM_BRANDS,
+        activation='tanh',
+        bias_initializer='zeros',
+        name='user_profile_layer')(user_profile)
+    user_profile = tf.keras.layers.Reshape(target_shape=[conf.NUM_DAYS, conf.NUM_BRANDS])(user_profile)
+
+    # # rnn layers
+    x = tf.keras.layers.Concatenate(axis=2, name='conc_x_and_brand_profile')([x_input, brand_profile_input])
+    # x: [batch_size, num_days, 2 * num_lstm_state]
+    x = tf.keras.layers.Bidirectional(
+        layer=tf.keras.layers.LSTM(
+            units=conf.NUM_LSTM_STATE,
+            dropout=drop_out,
+            return_sequences=True,
+            input_shape=(conf.NUM_DAYS, conf.NUM_BRANDS * (conf.NUM_POS + 1))
+        ),
+        name='x_bi_lstm_rnn')(x)
+    # x: [batch_size, num_days, num_brands]
+    x = tf.keras.layers.Dense(
+        units=conf.NUM_BRANDS,
+        activation='tanh',
+        kernel_initializer=tf.keras.initializers.truncated_normal(
+            stddev=1.0 / math.sqrt(2 * conf.NUM_LSTM_STATE)),
+        bias_initializer='zeros',
+        name='x_out')(x)
+
+    # # predictions
+    predictions = tf.keras.layers.Add()([x, user_profile])
+    predictions = tf.keras.layers.Dropout(rate=drop_out, name='output_dropout')(predictions)
+    predictions = tf.keras.layers.Dense(
+        units=conf.NUM_BRANDS,
+        activation='tanh',
+        kernel_initializer=tf.keras.initializers.truncated_normal(
+            stddev=1.0 / math.sqrt(conf.NUM_BRANDS)),
+        bias_initializer='zeros',
+        name='output_layer')(predictions)
+
+    # build the model
+    model = tf.keras.Model(inputs=[x_input, user_profile_input, brand_profile_input], outputs=predictions)
+
+    return model
 
 
 def loss(predictions, labels):
@@ -115,19 +164,19 @@ def get_loss(scope, y, x, brand_profile, user_profile, keep_prob):
 
     # Add some summaries and metrics.
     validation_metrics = metrics.get_validation_metrics(
-        logits_predictions=logits_predictions, labels=y, threshold=THRESHOLD_FOR_CLASSIFICATION, scope=scope)
+        logits_predictions=logits_predictions, labels=y, threshold=conf.THRESHOLD_FOR_CLASSIFICATION, scope=scope)
     return cross_entropy_loss, validation_metrics
 
 
 def train(total_loss, global_step):
     # Variables that affect learning rate.
-    decay_steps = LEARNING_DECAY_STEP_SIZE
+    decay_steps = conf.LEARNING_DECAY_STEP_SIZE
 
     # Decay the learning rate exponentially based on the number of steps.
-    lr = tf.train.exponential_decay(LEARNING_RATE,
+    lr = tf.train.exponential_decay(conf.LEARNING_RATE,
                                     global_step,
                                     decay_steps,
-                                    LEARNING_RATE_DECAY_FACTOR,
+                                    conf.LEARNING_RATE_DECAY_FACTOR,
                                     staircase=True)
 
     summaries = tf.get_collection(tf.GraphKeys.SUMMARIES)
@@ -155,7 +204,8 @@ if __name__ == '__main__':
     string_handle = sess.run(iterator.string_handle())
 
     cross_entropy_loss, validation_metrics = get_loss(
-        scope=None, y=batch['y'], x=batch['x'], brand_profile=batch['brand_profile'], user_profile=batch['user_profile'], keep_prob=0.8)
+        scope=None, y=batch['y'], x=batch['x'], brand_profile=batch['brand_profile'],
+        user_profile=batch['user_profile'], keep_prob=0.8)
 
     global_step = tf.get_variable(
         'global_step', [],
