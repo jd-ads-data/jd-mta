@@ -1,12 +1,12 @@
 # JD-MTA: Causally Driven Incremental Multi Touch Attribution Using a Recurrent Neural Network
-The repository contains the source code in **TensorFlow** for the implementation of the framework proposed in our paper:
+The repository contains sample code in **TensorFlow** for a simulation that implements MTA framework proposed in our paper:
 >[Causally Driven Incremental Multi Touch Attribution Using a Recurrent Neural Network](https://arxiv.org/abs/1902.00215)
 >Ruihuan Du, Yu Zhong, Harikesh Nair, Bo Cui, Ruyang Shou
 >Preprint 2019
 
 ### Introduction
 
-The source code is in the `python_tf/` folder. We also provide a simulation data in tfrecord format, which can be found in `data/` filder. The function of each python scripts in the repository is listed in the following table.
+The code is in the `python_tf/` folder. The simulation data in provided tfrecord format, and in the `data/` filder. The function of each python script in the repository is listed in the table below.
 
 | Script Path | Function |
 |--- | --- |
