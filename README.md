@@ -30,12 +30,12 @@ User behavior is simulated at fixed parameters values under a model with sequent
 | a | 2 | Average number of ad-exposures a user sees at one ad-position for one brand in one day. |
 | N | 100000 | Number of simulated users in the simulation data. |
 
-Let i = 1..N be the index of the user, $b=1..B$ be the index of the brand and $t=1..T$ be the index of the day. We denote by x_{i,t,b} the ad-exposure vector for user $i$ and brand $b$ in day $t$, $y_{i,t,b}$ the binary value that denoted whether there is a conversion for user $i$ and brand $b$ at day $t$, $d_i$ the user characterastics (i.e., user time-invariant attributes) and $r_b$ the brand price indices for brand $b$ (i.e., brand time-invariant attributes). The data are simulated as following, a more detailed explain of the process can be found in detailed_explain_of_simulation.pdf:
+Let i = 1..N index users, $b=1..B$ index brands and $t=1..T$ index days. We denote by x_{i,t,b} a vector that contains the exposure to ads by user $i$ for brand $b$ on day $t$; by $y_{i,t,b}$ a binary value for whether there is a conversion by user $i$ of brand $b$ on day $t$; by $d_i$ the user's characterastics (i.e., user time-invariant attributes); and by $r_b$ the price indices for brand $b$. The data are simulated as follows (a more detailed explain of the process can be found in detailed_explain_of_simulation.pdf):
 
-1. Draw a random scalar to simulate the user characterastics.
+1. Draw a random scalar to simulate user characterastics.
 2. Draw T-length random vector to simulate the brand price indices in each time period.
-3. Draw a T-length random vector for each i, t, b to simulate the user i's ad-exporues at day t and brand b, denoted as x_{i,t,b}.
-4. Simulate the influence of user i's history ad-exposures before day t to the conversion of day t, denoted by h_{i, 0, b}, as a function of some constants, x_{i, t-1} and h_{i, t-1, b}.
+3. Draw a T-length random vector for each i, t, b to simulate user i's ad-exposures on day t to brand b's ads, denoted as x_{i,t,b}.
+4. Simulate user i's history ad-exposures before day t to the conversion of day t, denoted by h_{i, 0, b}, as a function of some constants, x_{i, t-1} and h_{i, t-1, b}.
 5. Simulate the influence of user i's ad-exposurs at and before day t to the conversion of day t, denoted by u_{i,t,b}, as a function of some constants, x_{i, t, b}, d_i, h_{i, t, b}  and r_b.
 6. Simulate the user i's attampt to make a conversion at day t as a sigmoid function of u_{i,t,b}, denoted as p_{i,t,b}.
 7. Simulate the user i's actural decision whether to make a conversion by draw a Bernoulli random value with parameter = p_{i,t,b}.
