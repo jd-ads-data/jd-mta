@@ -39,7 +39,7 @@ The data are simulated as follows (a more detailed explain of the process can be
 3. Draw a T-length random vector for each i, t, b and ad-position to simulate user i's ad-exposures on day t to brand b's ads,  x_{i,t,b}.
 4. Simulate user i's initial conditions with respect to each brand, h_{i, 0, b}.
 5. Given h_{i, 0, b} and parameters, forward simulate user i's recurrent term for each b in each t, denoted h_{i, t, b}, as a function x_{i, t-1} and h_{i, t-1, b}. The recurrence generates time-dependence in user behavior.
-6. Compute u_{i,t,b}, the "attractiveness" of brand b for user i in time t as a function of x_{i, t, b}, d_i, h_{i, t, b}  and r_{b,t}.
+6. Compute u_{i,t,b}, the "attractiveness" of brand b for user i in time t as a linear function of x_{i, t, b}, d_i, h_{i, t, b}  and r_{b,t}.
 7. Transform u_{i,t,b} via a sigmoid function to obtain the probability of conversion by user i of brand b in time t, p_{i,t,b}.
 8. Simulate conversion by user i of brand b in time t y_{i,t,b} by drawing a Bernoulli random variate with mean p_{i,t,b}.
 
