@@ -1,5 +1,5 @@
 # JD-MTA: Causally Driven Incremental Multi Touch Attribution Using a Recurrent Neural Network
-The repository contains sample code in **TensorFlow** for a simulation that implements MTA framework proposed in our paper:
+The repository contains sample code in **TensorFlow** for a simulation that implements a simple, small-scale version of the MTA framework proposed in our paper:
 >[Causally Driven Incremental Multi Touch Attribution Using a Recurrent Neural Network](https://arxiv.org/abs/1902.00215)
 >Ruihuan Du, Yu Zhong, Harikesh Nair, Bo Cui, Ruyang Shou
 >Preprint 2019
