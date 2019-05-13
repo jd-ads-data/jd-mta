@@ -12,7 +12,7 @@ The code is in the `python_tf/` folder. The simulation dataset is in the `data/`
 |--- | --- |
 | `python_tf/consigures.py` | Configuration file. |
 | `python_tf/input.py` | Processes tfrecord files by dataset. |
-| `python_tf/model.py` | Expresses the rnn model. |
+| `python_tf/model.py` | Expresses the RNN model. |
 | `python_tf/shapley_value.py` | Computes the Shapley Value. |
 | `python_tf/tfrecord_helper.py` | Defines methods that are used in generating the simulated data. |
 | `generate_simulation_data.py` | Generates the simulated data. |
