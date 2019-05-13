@@ -4,6 +4,8 @@ The repository contains sample code in **TensorFlow** for a simulation that impl
 >Ruihuan Du, Yu Zhong, Harikesh Nair, Bo Cui, Ruyang Shou
 >Preprint 2019
 
+Code is meant for academic replication purposes only. No confidential or proprietary details are revealed here.
+
 ### Introduction
 
 The code is in the `python_tf/` folder. The simulation dataset is in the `data/` folder. The different python scripts in the repository are below:
