@@ -30,7 +30,7 @@ User behavior is simulated at fixed parameters values under a model with sequent
 | a | 2 | Average number of ad-exposures a user sees at one ad-position for one brand in one day. |
 | N | 100000 | Number of simulated users in the simulation data. |
 
-Let i = 1..N index users, $b=1..B$ index brands and $t=1..T$ index days. We denote by x_{i,t,b} a vector that contains the exposure to ads by user $i$ for brand $b$ on day $t$ across the various ad-positions; by $r_{b,t}$ the price indices for brand $b$ on day $t$; by $d_i$ the user's characterastics (i.e., user time-invariant attributes); i's initial conditions with respect to each brand by h_{i, 0, b}; and by $y_{i,t,b}$ a binary value for whether there is a conversion by user $i$ of brand $b$ on day $t$.
+Let i = 1..N index users, $b=1..B$ index brands and $t=1..T$ index days. We denote by x_{i,t,b} a vector that contains the exposure to ads by user i for brand b on day t across the various ad-positions; by r_{b,t} the price indices for brand b on day t; by d_i the user's characterastics (i.e., user time-invariant attributes); i's initial conditions with respect to each brand by h_{i, 0, b}; and by y_{i,t,b} a binary value for whether there is a conversion by user i of brand b on day t.
 
 The data are simulated as follows (a more detailed explain of the process can be found in detailed_explain_of_simulation.pdf):
 
