@@ -46,16 +46,17 @@ def compute_shapley_value(x, user_characteristics, brand_price_index, brand_inde
         prediction = predict_fn(cp_x, user_characteristics, brand_price_index, brand_index)
 
         num_pos_in_case_index = count_1_in_binary(case_index)
+
         factorial_n = math.factorial(num_tuples)
         for j in range(num_tuples):
             if get_bit(case_index, j):
                 s = num_pos_in_case_index - 1
                 value_to_add = 1. * math.factorial(num_tuples - s - 1) * math.factorial(s) / factorial_n * prediction
-                shapley_value_for_tuple[non_zero_tuple_index_list[j]] += value_to_add
+                shapley_value_for_tuple[non_zero_tuple_index_list[j][0], non_zero_tuple_index_list[j][1]] += value_to_add
             else:
                 s = num_pos_in_case_index
                 value_to_minus = 1. * math.factorial(num_tuples - s - 1) * math.factorial(s) / factorial_n * prediction
-                shapley_value_for_tuple[non_zero_tuple_index_list[j]] -= value_to_minus
+                shapley_value_for_tuple[non_zero_tuple_index_list[j][0], non_zero_tuple_index_list[j][1]] -= value_to_minus
 
     # normalize the shapley value
     x_0 = np.copy(x)
@@ -63,8 +64,8 @@ def compute_shapley_value(x, user_characteristics, brand_price_index, brand_inde
         date_index = tup[0]
         brand_pos_index = tup[1] + brand_index * conf.NUM_POS
         x_0[date_index, brand_pos_index] = 0.0
-        if shapley_value_for_tuple[tup] < 0.0:
-            shapley_value_for_tuple[tup] = 0.0
+        if shapley_value_for_tuple[tup[0], tup[1]] < 0.0:
+            shapley_value_for_tuple[tup[0], tup[1]] = 0.0
 
     p_x = predict_fn(x, user_characteristics, brand_price_index, brand_index)
     p_0 = predict_fn(x_0, user_characteristics, brand_price_index, brand_index)
@@ -73,11 +74,11 @@ def compute_shapley_value(x, user_characteristics, brand_price_index, brand_inde
 
     if sum_all_shapley_values > 1e-10 and inc_p > 1.0e-10:
         for tup in non_zero_tuple_index_list:
-            shapley_value_for_tuple[tup] = shapley_value_for_tuple[tup] * inc_p / sum_all_shapley_values
+            shapley_value_for_tuple[tup[0], tup[1]] = shapley_value_for_tuple[tup[0], tup[1]] * inc_p / sum_all_shapley_values
     else:
         shapley_value_for_tuple = np.zeros([conf.NUM_DAYS, conf.NUM_POS])
 
-    shapley_value_for_pos = np.sum(shapley_value_for_tuple, 1)
+    shapley_value_for_pos = np.sum(shapley_value_for_tuple, 0)
 
     return shapley_value_for_pos
 
