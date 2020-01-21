@@ -14,7 +14,7 @@ beta0 = -500
 beta1 = np.random.uniform(0.0, 10.0, [conf.NUM_BRANDS, conf.NUM_POS])
 beta2 = 15.0
 beta3 = np.random.normal(0.0, 1., conf.NUM_BRANDS)
-brand_price_index = np.random.lognormal(-3.0, 0.25, [conf.NUM_DAYS, conf.NUM_BRANDS])
+brand_price_index = np.random.lognormal(0.0, 0.25, [conf.NUM_DAYS, conf.NUM_BRANDS])
 
 sum_p = 0.0
 num_p = 0.0

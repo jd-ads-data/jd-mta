@@ -12,8 +12,8 @@ def mta_example():
     print('------- Generating data.')
     training_file = 'data/training_data.tfrecord'
     evaluation_file = 'data/evaluation_data.tfrecord'
-    gsd.simulate_data_and_save(100000, training_file)
-    gsd.simulate_data_and_save(10000, evaluation_file)
+    # gsd.simulate_data_and_save(10000, training_file)
+    # gsd.simulate_data_and_save(10000, evaluation_file)
     print('------- Save data successfully.')
 
     # get the input dataset and initialize the iterators
@@ -36,7 +36,7 @@ def mta_example():
     print('------- Train the model using training data.')
     rnn_model.fit(
         x=[training_data['x'], training_data['user_characteristics'], training_data['brand_price_index']], y=training_data['y'],
-        steps_per_epoch=400, epochs=20, sample_weight=training_data['sample_weight'])
+        steps_per_epoch=400, epochs=5, sample_weight=training_data['sample_weight'])
 
     # evaluate the model
     print('------- Evaluate the model using evaluation data.')
