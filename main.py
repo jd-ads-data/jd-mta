@@ -12,8 +12,8 @@ def mta_example():
     print('------- Generating data.')
     training_file = 'data/training_data.tfrecord'
     evaluation_file = 'data/evaluation_data.tfrecord'
-    # gsd.simulate_data_and_save(10000, training_file)
-    # gsd.simulate_data_and_save(10000, evaluation_file)
+    gsd.simulate_data_and_save(10000, training_file)
+    gsd.simulate_data_and_save(10000, evaluation_file)
     print('------- Save data successfully.')
 
     # get the input dataset and initialize the iterators
