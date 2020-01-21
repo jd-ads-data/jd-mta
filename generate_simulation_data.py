@@ -5,16 +5,16 @@ import tensorflow as tf
 from python_tf import configures as conf
 from python_tf import tfrecord_helper
 
-AVG_NUM_IMP = 2.0
+AVG_NUM_IMP = 3.0
 lambda1 = 0.5
-alpha0 = 1.0
-alpha1 = np.abs(np.random.lognormal(0.0, 1.0, [conf.NUM_BRANDS, conf.NUM_POS]))
+alpha0 = -7.0
+alpha1 = np.abs(np.random.lognormal(0.0, 5.0, [conf.NUM_BRANDS, conf.NUM_POS]))
 alpha2 = np.random.lognormal(0.0, 1.0, [conf.NUM_BRANDS, 1])
-beta0 = -200
-beta1 = np.random.uniform(0.1, 0.9, [conf.NUM_BRANDS, conf.NUM_POS])
-beta2 = 0.01
-beta3 = np.random.lognormal(0.0, 1.0, conf.NUM_BRANDS)
-brand_price_index = np.random.lognormal(0.0, 0.25, [conf.NUM_DAYS, conf.NUM_BRANDS])
+beta0 = -500
+beta1 = np.random.uniform(0.0, 10.0, [conf.NUM_BRANDS, conf.NUM_POS])
+beta2 = 15.0
+beta3 = np.random.normal(0.0, 1., conf.NUM_BRANDS)
+brand_price_index = np.random.lognormal(-3.0, 0.25, [conf.NUM_DAYS, conf.NUM_BRANDS])
 
 sum_p = 0.0
 num_p = 0.0
@@ -42,8 +42,8 @@ def generate_one_user():
         for t in range(0, conf.NUM_DAYS):
             h[t + 1, b] = lambda1 * sigmoid(alpha0 + np.dot(x[t, b], alpha1[b]) + \
                                             np.dot(brand_price_index[t, b], alpha2[b])) + (1.0 - lambda1) * h[t, b]
-            u[t, b] = beta0 * user_characteristics + np.dot(x[t, b], beta1[b]) + h[t + 1, b] * beta2 + np.dot(brand_price_index[t, b],
-                                                                                                beta3[b])
+            u[t, b] = beta0 * user_characteristics + np.dot(x[t, b], beta1[b]) + h[t + 1, b] * beta2 + \
+                      np.dot(brand_price_index[t, b], beta3[b])
             p[t, b] = sigmoid(u[t, b])
 
     y = np.random.binomial(np.ones(conf.NUM_DAYS * conf.NUM_BRANDS, dtype=int),
@@ -55,6 +55,9 @@ def generate_one_user():
 
 
 def simulate_data_and_save(num_samples, path):
+    global sum_p, num_p
+    sum_p = 0.0
+    num_p = 0.0
     writer = tf.io.TFRecordWriter(path)
     for i in range(num_samples):
         x, user_characteristics, y = generate_one_user()

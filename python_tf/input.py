@@ -24,7 +24,7 @@ def _parse_function(example_proto):
     return input_tensors
 
 
-def get_dataset(file_list, batch_size, shuffle=False, repeat=True):
+def get_dataset(file_list, batch_size, shuffle=False, repeat=True, pos_weights=0.5):
     dataset = tf.data.TFRecordDataset(file_list)
     dataset = dataset.map(_parse_function)
     dataset = dataset.map(
@@ -38,6 +38,8 @@ def get_dataset(file_list, batch_size, shuffle=False, repeat=True):
             'brand_price_index': tf.reshape(brand_price_index, [conf.NUM_DAYS, conf.NUM_BRANDS]),
             # y: [num_days, num_brands]
             'y': tf.reshape(y, [conf.NUM_DAYS, conf.NUM_BRANDS]),
+            'sample_weight': pos_weights * tf.cast(tf.greater(tf.reduce_sum(y), 0.0), tf.float16) +
+                             (1 - pos_weights) * (1 - tf.cast(tf.greater(tf.reduce_sum(y), 0.0), tf.float16)),
         })
     if shuffle:
         dataset = dataset.shuffle(buffer_size=int(batch_size * 1.5))
@@ -58,10 +60,12 @@ if __name__ == '__main__':
     batch, ite = get_dataset(
         file_list=tfrecord_file_names,
         batch_size=1,
+        pos_weights=0.97
     )
 
     sess.run(ite)
 
     for i in range(15):
-        a = tf.reduce_sum(batch['x'])
+        a = tf.reduce_sum(batch['sample_weight'])
         print(sess.run(a, ))
+        print(sess.run(batch['sample_weight'], ))
